@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Shreyas G | Space Operations Digital Twin Research</title>
+<title>Shreyas Gaikwad | Space Operations & Defence Research</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
@@ -11,107 +11,78 @@
 
 <style>
 body {
-  margin: 0;
-  background: #000813;
-  color: #b8d7ff;
-  font-family: 'Inter', sans-serif;
-  overflow: hidden;
+  margin:0;
+  background:#020812;
+  color:#c7dcff;
+  font-family:Inter, sans-serif;
+  overflow:hidden;
 }
 
-/* Subtle Mission Control Grid */
-body::before {
+/* Mission Control Grid */
+body::before{
   content:"";
   position:fixed;
   inset:0;
   background:
-    linear-gradient(#0a1a3333 1px, transparent 1px),
-    linear-gradient(90deg, #0a1a3333 1px, transparent 1px);
-  background-size: 60px 60px;
+    linear-gradient(#0b1f3333 1px, transparent 1px),
+    linear-gradient(90deg,#0b1f3333 1px, transparent 1px);
+  background-size:70px 70px;
   z-index:-1;
 }
 
-/* HUD Glass Panels */
-.panel {
-  position: fixed;
-  background: rgba(5,15,40,0.6);
-  border: 1px solid rgba(120,180,255,0.15);
-  backdrop-filter: blur(10px);
-  padding: 16px;
-  font-size: 14px;
-  box-shadow: inset 0 0 30px rgba(100,150,255,0.05);
+/* HUD Panels */
+.panel{
+  position:fixed;
+  background:rgba(8,20,50,0.65);
+  border:1px solid rgba(140,190,255,0.18);
+  backdrop-filter:blur(12px);
+  padding:14px;
+  font-size:13px;
+  box-shadow: inset 0 0 25px rgba(120,180,255,0.05);
+  transition:.3s;
+}
+.panel:hover{
+  transform:translateY(-3px);
+  box-shadow:0 0 18px rgba(120,180,255,.25);
 }
 
-/* Floating AR Panel effect */
-.panel:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 0 20px rgba(100,150,255,0.25);
-  transition: 0.3s;
+/* Top Header */
+#header{top:15px;left:15px;width:460px;}
+#nav{top:15px;left:500px;display:flex;gap:10px;}
+.navbtn{
+  padding:8px 14px;border:1px solid rgba(140,190,255,.25);
+  background:rgba(10,30,60,.6);cursor:pointer;
+  font-family:Orbitron;font-size:12px;color:#bcd8ff;
+}
+.navbtn:hover{background:#0b2c55;}
+
+/* Right Info Panel */
+#info{top:15px;right:15px;width:420px;}
+
+/* Bottom Console */
+#console{bottom:15px;left:15px;width:65%;font-family:monospace;color:#8fffff;background:rgba(0,10,30,.75);}
+
+/* Content Pages */
+.page{
+  position:fixed;
+  top:120px;left:15px;right:15px;bottom:90px;
+  background:rgba(6,15,35,0.75);
+  border:1px solid rgba(120,180,255,.15);
+  backdrop-filter:blur(12px);
+  padding:20px;
+  overflow:auto;
+  display:none;
 }
 
-/* Header */
-#header {
-  top: 20px;
-  left: 20px;
-  width: 420px;
+/* Crosshair */
+.crosshair{
+  position:fixed;top:50%;left:50%;
+  width:22px;height:22px;border:1px solid rgba(160,200,255,.25);
+  transform:translate(-50%,-50%);
 }
 
-h1 {
-  font-family: 'Orbitron', sans-serif;
-  font-size: 20px;
-  letter-spacing: 2px;
-  color: #e6f0ff;
-}
-
-h2 {
-  font-family: 'Orbitron', sans-serif;
-  font-size: 14px;
-  color: #9bc4ff;
-}
-
-/* Right Data Panel */
-#dataPanel {
-  top: 20px;
-  right: 20px;
-  width: 380px;
-}
-
-/* Bottom Ops Console */
-#console {
-  bottom: 20px;
-  left: 20px;
-  width: 65%;
-  font-family: monospace;
-  font-size: 13px;
-  color: #7effff;
-  background: rgba(0,10,30,0.7);
-}
-
-/* HUD Tags */
-.tag {
-  display: inline-block;
-  border: 1px solid rgba(120,180,255,0.25);
-  padding: 4px 8px;
-  margin: 3px;
-  font-size: 12px;
-  color: #cce0ff;
-}
-
-/* Holographic Slider UI */
-.slider {
-  width: 100%;
-  margin-top: 8px;
-}
-
-/* Minimal Crosshair */
-.crosshair {
-  position: fixed;
-  top: 50%;
-  left: 50%;
-  width: 20px;
-  height: 20px;
-  border: 1px solid rgba(150,200,255,0.3);
-  transform: translate(-50%,-50%);
-}
+/* Tags */
+.tag{border:1px solid rgba(140,190,255,.25);padding:3px 8px;margin:3px;display:inline-block;font-size:12px;}
 </style>
 </head>
 
@@ -119,96 +90,165 @@ h2 {
 
 <div class="crosshair"></div>
 
-<!-- LEFT HEADER -->
+<!-- HEADER -->
 <div id="header" class="panel">
-<h1>Shreyas G</h1>
-<p>Space Operations & Digital Twin Research<br>
-AI Defence Systems | Fighter Pilot (IAF)</p>
-
-<h2>Operational Focus</h2>
+<h2 style="font-family:Orbitron;letter-spacing:2px;">SQN LDR SHREYAS GAIKWAD</h2>
+<p>Indian Air Force | Flying (Pilot) Branch<br>
+Space Operations, Defence Research & Digital Twin Architect</p>
 <div class="tag">Orbital Digital Twins</div>
+<div class="tag">AI Defence Systems</div>
 <div class="tag">Space Traffic Management</div>
-<div class="tag">AI Threat Prioritization</div>
-<div class="tag">Air Defence Systems</div>
+<div class="tag">Operations Planning</div>
 </div>
 
-<!-- RIGHT DATA PANEL -->
-<div id="dataPanel" class="panel">
-<h2>Academic & Operational Background</h2>
+<!-- NAV -->
+<div id="nav" class="panel">
+<div class="navbtn" onclick="openPage('overview')">OVERVIEW</div>
+<div class="navbtn" onclick="openPage('operations')">OPERATIONS</div>
+<div class="navbtn" onclick="openPage('research')">RESEARCH</div>
+<div class="navbtn" onclick="openPage('education')">EDUCATION</div>
+<div class="navbtn" onclick="openPage('publications')">PUBLICATIONS</div>
+</div>
+
+<!-- RIGHT PANEL -->
+<div id="info" class="panel">
+<h3 style="font-family:Orbitron;">Service Snapshot</h3>
+<ul>
+<li>Commissioned: 19 Dec 2015</li>
+<li>Total Service: 9 Years 8 Months</li>
+<li>Released: </li>
+<li>Appointments: Multiple at Various Levels of operations</li>
+</ul>
+
+<h3>System Controls</h3>
+Time Warp <input type="range" min="1" max="100" value="1"><br>
+Orbit Density <input type="range" min="1" max="100" value="50">
+</div>
+
+<!-- CONSOLE -->
+<div id="console" class="panel">
+> INITIALIZING SPACE OPERATIONS CONSOLE...<br>
+> DIGITAL TWIN CORE ONLINE<br>
+> MISSION STATUS: STANDBY<br>
+> USER AUTHORITY: SHREYAS GAIKWAD<br>
+</div>
+
+<!-- =================== PAGES =================== -->
+
+<div id="overview" class="page">
+<h2>Professional Summary</h2>
+<p>Fighter pilot with nearly a decade of operational flying, planning and training experience, combined with multidisciplinary academic training in defence studies, data engineering, management and space technology research. Current focus on orbital digital twins, AI-enabled space governance and defence technology integration.</p>
+</div>
+
+<div id="operations" class="page">
+<h2>Operational Experience</h2>
+<ul>
+<li>Operational Su-30 MKI pilot; supervised operational planning and training.</li>
+<li>Operations Adjutant coordinating multi-unit air defence planning.</li>
+<li>Field Operations Manager overseeing combat assets and joint operations.</li>
+<li>Officer-in-Charge, Su-30 Full Motion Simulator System.</li>
+<li>Key projects: high-altitude practice range survey, ALH communications upgrade, CBRN and reconnaissance portfolios.</li>
+</ul>
+</div>
+
+<div id="research" class="page">
+<h2>Research & Technical Work</h2>
+<ul>
+<li>AI Air Defence Threat Prioritization Framework</li>
+<li>Orbital Space Traffic Digital Twin Architecture</li>
+<li>Space Governance Framework using AI (under review)</li>
+<li>Data Engineering & Computational Intelligence research</li>
+</ul>
+</div>
+
+<div id="education" class="page">
+<h2>Education</h2>
 <ul>
 <li>B.Sc Physics – University of Pune</li>
-<li>M.Sc Defence & Strategic Studies</li>
-<li>MBA (HR) – Symbiosis University</li>
+<li>M.Sc Defence & Strategic Studies – SPPU</li>
+<li>MBA (HR) – Symbiosis</li>
+<li>M.Tech Data Engineering – IIT Jodhpur (ongoing)</li>
+<li>Doctoral Research Scholar – DIAT Pune</li>
 </ul>
-
-<h2>Validated Projects & Prototypes</h2>
-<ul>
-<li>AI-based Air Defence Threat Prioritization Model</li>
-<li>Orbital Space Traffic Digital Twin Architecture</li>
-<li>Docker Scalable Multi-Container Web System</li>
-<li>Information Diffusion Simulation (SIR Network Model)</li>
-</ul>
-
-<h2>System Control</h2>
-Time Warp: <input type="range" class="slider" min="1" max="100" value="1">
-Orbit Visibility: <input type="range" class="slider" min="0" max="100" value="100">
 </div>
 
-<!-- BOTTOM CONSOLE -->
-<div id="console" class="panel">
-> INITIALIZING SPACE OPERATIONS INTERFACE...<br>
-> DIGITAL TWIN CORE: ONLINE<br>
-> ORBITAL ANALYTICS: STANDBY<br>
-> USER AUTHORITY: SHREYAS G<br>
+<div id="publications" class="page">
+<h2>Publications</h2>
+<ul>
+<li>Moths Diversity of Ziro, Arunachal Pradesh (2021)</li>
+<li>Enhancing Cyber Security & Asymmetric Warfare Capabilities (2025)</li>
+<li>Space Governance Framework using AI (under review)</li>
+</ul>
 </div>
 
 <script>
-// ================= NASA-STYLE EARTH VISUALIZATION =================
-let scene = new THREE.Scene();
-let camera = new THREE.PerspectiveCamera(50, window.innerWidth/window.innerHeight, 0.1, 1000);
-camera.position.z = 3.5;
+// PAGE SWITCHER
+function openPage(id){
+  document.querySelectorAll('.page').forEach(p=>p.style.display="none");
+  document.getElementById(id).style.display="block";
+}
 
-let renderer = new THREE.WebGLRenderer({antialias:true, alpha:true});
-renderer.setSize(window.innerWidth, window.innerHeight);
+// DEFAULT PAGE
+openPage("overview");
+
+// ================= LIVE ORBITAL TWIN VISUAL =================
+let scene=new THREE.Scene();
+let camera=new THREE.PerspectiveCamera(55,innerWidth/innerHeight,0.1,1000);
+camera.position.z=3.5;
+
+let renderer=new THREE.WebGLRenderer({alpha:true,antialias:true});
+renderer.setSize(innerWidth,innerHeight);
 document.body.appendChild(renderer.domElement);
 
 // Earth
-let earthGeo = new THREE.SphereGeometry(1,64,64);
-let tex = new THREE.TextureLoader().load("https://threejs.org/examples/textures/land_ocean_ice_cloud_2048.jpg");
-let earthMat = new THREE.MeshPhongMaterial({map: tex});
-let earth = new THREE.Mesh(earthGeo, earthMat);
+let earthGeo=new THREE.SphereGeometry(1,64,64);
+let tex=new THREE.TextureLoader().load("https://threejs.org/examples/textures/land_ocean_ice_cloud_2048.jpg");
+let earthMat=new THREE.MeshPhongMaterial({map:tex});
+let earth=new THREE.Mesh(earthGeo,earthMat);
 scene.add(earth);
 
-// Lighting (Mission Control style)
-let keyLight = new THREE.DirectionalLight(0xffffff, 1);
-keyLight.position.set(5,2,5);
-scene.add(keyLight);
+// Lights
+scene.add(new THREE.DirectionalLight(0xffffff,1).position.set(5,3,5));
+scene.add(new THREE.AmbientLight(0x223344));
 
-let ambient = new THREE.AmbientLight(0x223344);
-scene.add(ambient);
-
-// Minimal Orbits (subtle)
-let orbitMat = new THREE.LineBasicMaterial({color:0x446688});
-for(let i=1;i<=3;i++){
-  let orbitGeo = new THREE.RingGeometry(1.3+i*0.2, 1.3+i*0.2, 128);
-  let orbit = new THREE.Mesh(orbitGeo, orbitMat);
-  orbit.rotation.x = Math.PI/2;
+// Orbits
+let orbitMat=new THREE.LineBasicMaterial({color:0x335577});
+for(let i=1;i<=5;i++){
+  let geo=new THREE.RingGeometry(1.3+i*0.15,1.3+i*0.15,128);
+  let orbit=new THREE.Mesh(geo,orbitMat);
+  orbit.rotation.x=Math.PI/2;
   scene.add(orbit);
+}
+
+// Fake satellites (placeholder for TLE)
+let satGeo=new THREE.SphereGeometry(0.01,8,8);
+let satMat=new THREE.MeshBasicMaterial({color:0xff4444});
+let sats=[];
+for(let i=0;i<200;i++){
+  let s=new THREE.Mesh(satGeo,satMat);
+  s.userData.angle=Math.random()*6.28;
+  s.userData.radius=1.3+Math.random()*0.7;
+  sats.push(s);scene.add(s);
 }
 
 // Animate
 function animate(){
   requestAnimationFrame(animate);
-  earth.rotation.y += 0.0002;
+  earth.rotation.y+=0.00015;
+  sats.forEach(s=>{
+    s.userData.angle+=0.002;
+    s.position.x=Math.cos(s.userData.angle)*s.userData.radius;
+    s.position.z=Math.sin(s.userData.angle)*s.userData.radius;
+  });
   renderer.render(scene,camera);
 }
 animate();
 
-window.addEventListener("resize", ()=>{
-  camera.aspect = window.innerWidth/window.innerHeight;
+window.onresize=()=>{
+  camera.aspect=innerWidth/innerHeight;
   camera.updateProjectionMatrix();
-  renderer.setSize(window.innerWidth, window.innerHeight);
-});
+  renderer.setSize(innerWidth,innerHeight);
+};
 </script>
 
 </body>
