@@ -1,164 +1,1165 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Classified War-Room Interface</title>
-<meta name="viewport" content="width=device-width, initial-scale=1">
-
-<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands/hands.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js"></script>
-
-<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600&family=Inter&display=swap" rel="stylesheet">
-
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SQN LDR SHREYAS GAIKWAD // IAF PROFILE</title>
+<link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;400;600;700&display=swap" rel="stylesheet">
 <style>
-body{
-  margin:0; background:#000308; color:#7ed6ff; overflow:hidden;
-  font-family:Inter;
+:root {
+  --hud-green: #00ff88;
+  --hud-cyan: #00e5ff;
+  --hud-amber: #ffb300;
+  --hud-red: #ff3d3d;
+  --hud-blue: #0066ff;
+  --bg-primary: #020b12;
+  --bg-secondary: #050f1a;
+  --bg-panel: rgba(0,230,255,0.04);
+  --border-glow: rgba(0,229,255,0.3);
+  --text-primary: #c8f0ff;
+  --text-dim: rgba(200,240,255,0.5);
+  --grid-color: rgba(0,229,255,0.06);
 }
 
-/* Pentagon Glass Grid */
-body::before{
-  content:""; position:fixed; inset:0;
-  background:radial-gradient(circle at center, rgba(0,50,120,0.15), transparent),
-             linear-gradient(#0c2a44 1px, transparent 1px),
-             linear-gradient(90deg,#0c2a44 1px, transparent 1px);
-  background-size:120px 120px;
-  z-index:-2;
+* { margin:0; padding:0; box-sizing:border-box; }
+
+body {
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  font-family: 'Rajdhani', sans-serif;
+  min-height: 100vh;
+  overflow-x: hidden;
 }
 
-/* Holographic HUD Panels */
-.panel{
-  position:fixed;
-  background:rgba(10,30,60,0.45);
-  border:1px solid rgba(100,200,255,0.3);
-  backdrop-filter:blur(20px);
+/* ─── GRID BACKGROUND ─────────────────────────────── */
+body::before {
+  content:'';
+  position:fixed; inset:0; z-index:0;
+  background-image:
+    linear-gradient(var(--grid-color) 1px, transparent 1px),
+    linear-gradient(90deg, var(--grid-color) 1px, transparent 1px);
+  background-size: 40px 40px;
+  pointer-events:none;
+}
+
+/* scanline */
+body::after {
+  content:'';
+  position:fixed; inset:0; z-index:1;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 2px,
+    rgba(0,0,0,0.08) 2px,
+    rgba(0,0,0,0.08) 4px
+  );
+  pointer-events:none;
+}
+
+/* ─── CANVAS ──────────────────────────────────────── */
+#bg-canvas {
+  position:fixed; inset:0; z-index:0;
+  opacity:0.4;
+}
+
+/* ─── WRAPPER ─────────────────────────────────────── */
+.wrapper { position:relative; z-index:2; min-height:100vh; display:flex; flex-direction:column; }
+
+/* ─── HEADER ──────────────────────────────────────── */
+header {
+  padding: 18px 32px 0;
+  display:flex; align-items:flex-start; justify-content:space-between;
+}
+
+.call-sign {
+  font-family:'Orbitron', sans-serif;
+  font-size:11px; letter-spacing:4px;
+  color: var(--hud-cyan); opacity:0.7;
+  margin-bottom:4px;
+}
+
+.name-block h1 {
+  font-family:'Orbitron', sans-serif;
+  font-size:clamp(18px,3vw,28px);
+  font-weight:900;
+  color:#fff;
+  text-shadow: 0 0 20px var(--hud-cyan), 0 0 40px rgba(0,229,255,0.3);
+  letter-spacing:3px;
+}
+
+.rank-line {
+  font-family:'Share Tech Mono', monospace;
+  font-size:12px;
+  color: var(--hud-green);
+  letter-spacing:2px;
+  margin-top:4px;
+}
+
+.sys-status {
+  font-family:'Share Tech Mono', monospace;
+  font-size:10px;
+  color: var(--hud-green);
+  text-align:right;
+  opacity:0.8;
+}
+
+.sys-status span { display:block; margin-bottom:2px; }
+
+.blink { animation: blink 1.2s step-end infinite; }
+@keyframes blink { 50% { opacity:0; } }
+
+/* ─── NAV TABS ────────────────────────────────────── */
+nav {
+  display:flex;
+  gap:2px;
+  padding: 20px 32px 0;
+  border-bottom: 1px solid var(--border-glow);
+  flex-wrap:wrap;
+}
+
+.tab-btn {
+  background: transparent;
+  border: 1px solid rgba(0,229,255,0.2);
+  border-bottom:none;
+  color: var(--text-dim);
+  font-family:'Orbitron', sans-serif;
+  font-size:9px;
+  letter-spacing:2px;
+  padding: 10px 18px;
+  cursor:pointer;
+  position:relative;
+  transition: all 0.2s;
+  clip-path: polygon(8px 0%, 100% 0%, calc(100% - 8px) 100%, 0% 100%);
+  margin-bottom:-1px;
+}
+
+.tab-btn::before {
+  content:attr(data-icon);
+  display:block;
+  font-size:16px;
+  margin-bottom:3px;
+  font-family:'Rajdhani', sans-serif;
+}
+
+.tab-btn:hover {
+  color: var(--hud-cyan);
+  border-color: rgba(0,229,255,0.5);
+  background: rgba(0,229,255,0.05);
+}
+
+.tab-btn.active {
+  color: var(--hud-cyan);
+  background: rgba(0,229,255,0.1);
+  border-color: var(--hud-cyan);
+  text-shadow: 0 0 10px var(--hud-cyan);
+}
+
+/* ─── CONTENT AREA ────────────────────────────────── */
+.content { flex:1; padding:24px 32px 40px; }
+
+.page { display:none; animation: fadeInPage 0.4s ease; }
+.page.active { display:block; }
+
+@keyframes fadeInPage {
+  from { opacity:0; transform:translateY(6px); }
+  to   { opacity:1; transform:translateY(0); }
+}
+
+/* ─── PANEL COMPONENT ─────────────────────────────── */
+.panel {
+  background: var(--bg-panel);
+  border: 1px solid var(--border-glow);
+  padding: 20px 24px;
+  position:relative;
+  margin-bottom:16px;
+}
+
+.panel::before {
+  content:'';
+  position:absolute;
+  top:0; left:0; right:0;
+  height:1px;
+  background: linear-gradient(90deg, transparent, var(--hud-cyan), transparent);
+}
+
+.panel-label {
+  font-family:'Share Tech Mono', monospace;
+  font-size:9px;
+  letter-spacing:3px;
+  color: var(--hud-cyan);
+  opacity:0.6;
+  margin-bottom:12px;
+  text-transform:uppercase;
+}
+
+/* ─── GRID LAYOUTS ────────────────────────────────── */
+.grid-2 { display:grid; grid-template-columns:1fr 1fr; gap:16px; }
+.grid-3 { display:grid; grid-template-columns:1fr 1fr 1fr; gap:16px; }
+.grid-auto { display:grid; grid-template-columns:repeat(auto-fit, minmax(220px,1fr)); gap:16px; }
+
+@media(max-width:768px) {
+  .grid-2, .grid-3 { grid-template-columns:1fr; }
+  nav { gap:1px; }
+  .tab-btn { padding:8px 12px; font-size:8px; }
+}
+
+/* ─── STAT BLOCKS ─────────────────────────────────── */
+.stat-block {
+  text-align:center;
   padding:16px;
-  box-shadow:0 0 25px rgba(100,200,255,0.2);
+  border:1px solid rgba(0,229,255,0.15);
+  background: rgba(0,229,255,0.03);
+  position:relative;
+  overflow:hidden;
 }
 
-#leftPanel{top:20px; left:20px; width:380px;}
-#rightPanel{top:20px; right:20px; width:380px;}
-#bottomPanel{bottom:20px; left:50%; transform:translateX(-50%); width:70%;}
+.stat-block .val {
+  font-family:'Orbitron', sans-serif;
+  font-size:clamp(24px,4vw,36px);
+  font-weight:900;
+  color: var(--hud-cyan);
+  text-shadow: 0 0 15px var(--hud-cyan);
+  display:block;
+}
 
-h1,h2{font-family:Orbitron;}
-h1{font-size:20px;}
-h2{font-size:14px;}
+.stat-block .lbl {
+  font-size:10px;
+  letter-spacing:2px;
+  color: var(--text-dim);
+  margin-top:4px;
+  display:block;
+  text-transform:uppercase;
+}
 
-.tag{border:1px solid #3aa3ff; padding:4px 8px; display:inline-block; margin:2px; font-size:12px;}
+.stat-block::after {
+  content:'';
+  position:absolute;
+  bottom:0; left:50%; transform:translateX(-50%);
+  width:60%; height:1px;
+  background: var(--hud-cyan);
+  opacity:0.3;
+}
 
-#inputVideo{display:none;}
+/* ─── PROGRESS BAR ────────────────────────────────── */
+.prog-row { margin-bottom:14px; }
+.prog-label {
+  display:flex; justify-content:space-between;
+  font-size:12px; color: var(--text-dim);
+  margin-bottom:5px;
+  font-family:'Share Tech Mono', monospace;
+}
+.prog-track {
+  height:4px;
+  background: rgba(0,229,255,0.1);
+  border:1px solid rgba(0,229,255,0.2);
+  position:relative;
+}
+.prog-fill {
+  height:100%;
+  background: linear-gradient(90deg, var(--hud-green), var(--hud-cyan));
+  box-shadow: 0 0 8px var(--hud-cyan);
+  width:0;
+  transition: width 1.2s cubic-bezier(0.4,0,0.2,1) 0.3s;
+}
+
+/* ─── LIST ITEMS ──────────────────────────────────── */
+.hud-list { list-style:none; }
+.hud-list li {
+  padding: 8px 0;
+  border-bottom: 1px solid rgba(0,229,255,0.07);
+  font-size:13px;
+  color: var(--text-primary);
+  display:flex;
+  gap:10px;
+  align-items:flex-start;
+  line-height:1.5;
+}
+.hud-list li::before {
+  content:'▸';
+  color: var(--hud-cyan);
+  flex-shrink:0;
+  margin-top:1px;
+}
+
+/* ─── BADGE ───────────────────────────────────────── */
+.badge {
+  display:inline-block;
+  background: rgba(0,255,136,0.1);
+  border:1px solid rgba(0,255,136,0.4);
+  color: var(--hud-green);
+  font-family:'Share Tech Mono', monospace;
+  font-size:9px;
+  letter-spacing:1px;
+  padding:3px 8px;
+  margin:2px;
+  text-transform:uppercase;
+}
+
+.badge.amber {
+  background: rgba(255,179,0,0.1);
+  border-color: rgba(255,179,0,0.4);
+  color: var(--hud-amber);
+}
+
+.badge.cyan {
+  background: rgba(0,229,255,0.1);
+  border-color: rgba(0,229,255,0.4);
+  color: var(--hud-cyan);
+}
+
+/* ─── TIMELINE ────────────────────────────────────── */
+.timeline { position:relative; padding-left:24px; }
+.timeline::before {
+  content:'';
+  position:absolute;
+  left:0; top:0; bottom:0;
+  width:1px;
+  background: linear-gradient(180deg, var(--hud-cyan), transparent);
+}
+.tl-item { position:relative; margin-bottom:20px; }
+.tl-item::before {
+  content:'';
+  position:absolute;
+  left:-28px; top:6px;
+  width:8px; height:8px;
+  border:1px solid var(--hud-cyan);
+  background: var(--bg-primary);
+  box-shadow: 0 0 8px var(--hud-cyan);
+}
+.tl-year {
+  font-family:'Share Tech Mono', monospace;
+  font-size:10px;
+  color: var(--hud-amber);
+  letter-spacing:2px;
+  margin-bottom:3px;
+}
+.tl-title {
+  font-family:'Orbitron', sans-serif;
+  font-size:11px;
+  color: var(--hud-cyan);
+  margin-bottom:4px;
+  letter-spacing:1px;
+}
+.tl-desc {
+  font-size:12px;
+  color: var(--text-dim);
+  line-height:1.6;
+}
+
+/* ─── RADAR SVG ───────────────────────────────────── */
+.radar-wrap { display:flex; justify-content:center; padding:10px 0; }
+
+/* ─── CIRCUIT LINES (EDUCATION PAGE) ─────────────── */
+.edu-card {
+  border:1px solid rgba(0,229,255,0.2);
+  padding:16px 20px;
+  margin-bottom:12px;
+  position:relative;
+  background: rgba(0,10,20,0.6);
+  clip-path: polygon(0 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 12px 100%, 0 calc(100% - 12px));
+}
+.edu-card::after {
+  content:'';
+  position:absolute; top:0; left:0;
+  width:40%; height:1px;
+  background: linear-gradient(90deg, var(--hud-cyan), transparent);
+}
+.edu-degree {
+  font-family:'Orbitron', sans-serif;
+  font-size:12px;
+  color: var(--hud-cyan);
+  letter-spacing:1px;
+  margin-bottom:4px;
+}
+.edu-inst {
+  font-size:13px;
+  color: var(--text-primary);
+  margin-bottom:2px;
+}
+.edu-meta {
+  font-family:'Share Tech Mono', monospace;
+  font-size:10px;
+  color: var(--text-dim);
+  display:flex; gap:16px; flex-wrap:wrap;
+}
+
+/* ─── HEXGRID ─────────────────────────────────────── */
+.hex-grid {
+  display:flex; flex-wrap:wrap; gap:8px;
+  justify-content:flex-start;
+}
+.hex-item {
+  background: rgba(0,229,255,0.05);
+  border:1px solid rgba(0,229,255,0.2);
+  padding:8px 12px;
+  font-size:11px;
+  color: var(--text-primary);
+  font-family:'Share Tech Mono', monospace;
+  letter-spacing:0.5px;
+  transition: all 0.2s;
+  cursor:default;
+}
+.hex-item:hover {
+  background: rgba(0,229,255,0.12);
+  border-color: var(--hud-cyan);
+  color: var(--hud-cyan);
+  text-shadow: 0 0 8px var(--hud-cyan);
+}
+
+/* ─── HOME SPECIFIC ───────────────────────────────── */
+.home-grid {
+  display:grid;
+  grid-template-columns:1fr 340px;
+  gap:16px;
+}
+
+@media(max-width:900px) { .home-grid { grid-template-columns:1fr; } }
+
+.hud-line {
+  display:flex; align-items:center; gap:12px;
+  padding:6px 0;
+  border-bottom:1px solid rgba(0,229,255,0.06);
+  font-size:13px;
+}
+.hud-line .key {
+  font-family:'Share Tech Mono', monospace;
+  font-size:10px;
+  color: var(--hud-amber);
+  letter-spacing:1px;
+  min-width:120px;
+  flex-shrink:0;
+}
+.hud-line .val2 { color: var(--text-primary); }
+
+.contact-block a {
+  color: var(--hud-cyan);
+  text-decoration:none;
+  font-family:'Share Tech Mono', monospace;
+  font-size:11px;
+}
+
+/* ─── OPS MAP DOTS ────────────────────────────────── */
+.ops-dot {
+  display:inline-block;
+  width:6px; height:6px;
+  border-radius:50%;
+  background: var(--hud-green);
+  box-shadow: 0 0 6px var(--hud-green);
+  margin-right:8px;
+  animation: pulse 2s ease-in-out infinite;
+}
+@keyframes pulse {
+  0%,100% { transform:scale(1); opacity:1; }
+  50% { transform:scale(1.5); opacity:0.5; }
+}
+
+/* ─── PUBLICATIONS ────────────────────────────────── */
+.pub-card {
+  border-left:2px solid var(--hud-cyan);
+  padding:12px 16px;
+  margin-bottom:12px;
+  background: rgba(0,229,255,0.03);
+}
+.pub-title { font-size:13px; color: var(--text-primary); margin-bottom:4px; line-height:1.5; }
+.pub-meta { font-family:'Share Tech Mono', monospace; font-size:10px; color: var(--hud-amber); }
+
+/* ─── CORNER DECORATIONS ──────────────────────────── */
+.corner-tl, .corner-br {
+  position:absolute;
+  width:12px; height:12px;
+}
+.corner-tl { top:-1px; left:-1px; border-top:2px solid var(--hud-cyan); border-left:2px solid var(--hud-cyan); }
+.corner-br { bottom:-1px; right:-1px; border-bottom:2px solid var(--hud-cyan); border-right:2px solid var(--hud-cyan); }
+
+/* ─── FOOTER ──────────────────────────────────────── */
+footer {
+  border-top:1px solid var(--border-glow);
+  padding:10px 32px;
+  display:flex; justify-content:space-between;
+  font-family:'Share Tech Mono', monospace;
+  font-size:9px;
+  color: var(--text-dim);
+  letter-spacing:1px;
+}
+
+/* ─── SECTION HEADER ──────────────────────────────── */
+.sec-hdr {
+  font-family:'Orbitron', sans-serif;
+  font-size:13px;
+  font-weight:700;
+  color: var(--hud-cyan);
+  letter-spacing:3px;
+  text-transform:uppercase;
+  margin-bottom:16px;
+  display:flex; align-items:center; gap:12px;
+}
+.sec-hdr::after {
+  content:'';
+  flex:1; height:1px;
+  background: linear-gradient(90deg, var(--hud-cyan), transparent);
+  opacity:0.3;
+}
+
+/* ─── RADAR CHART CANVAS ──────────────────────────── */
+#radar-canvas { max-width:280px; max-height:280px; }
 </style>
 </head>
-
 <body>
-<video id="inputVideo" autoplay></video>
 
-<div id="leftPanel" class="panel">
-<h1>WAR-ROOM DIGITAL TWIN</h1>
-<p>Commander: Shreyas G</p>
-<div class="tag">Orbital Twin</div>
-<div class="tag">AI Threat Analysis</div>
-<div class="tag">Space Ops</div>
-</div>
+<canvas id="bg-canvas"></canvas>
 
-<div id="rightPanel" class="panel">
-<h2>TACTICAL STATUS</h2>
-<p>Earth System: ONLINE</p>
-<p>Gesture Control: ACTIVE</p>
-<p>Data Link: SIMULATED</p>
-</div>
+<div class="wrapper">
 
-<div id="bottomPanel" class="panel">
-> SECURE OPS ROOM UI LOADED  
-> HUMAN-MACHINE INTERFACE ACTIVE  
-> FINGER CONTROL ENABLED  
-</div>
+<!-- ══ HEADER ════════════════════════════════════════ -->
+<header>
+  <div class="name-block">
+    <div class="call-sign">▸ INDIAN AIR FORCE // PERSONNEL RECORD // RESTRICTED</div>
+    <h1>SHREYAS GAIKWAD</h1>
+    <div class="rank-line">◈ SQUADRON LEADER · F(P) · 32 WG NAGPUR</div>
+  </div>
+  <div class="sys-status">
+    <span>SYS STATUS: <span style="color:var(--hud-green)">ONLINE</span></span>
+    <span id="clock" class="blink">--:--:-- IST</span>
+    <span>NODE: GEEK1060.GITHUB.IO</span>
+    <span>CLEARANCE: <span style="color:var(--hud-amber)">OPEN</span></span>
+  </div>
+</header>
+
+<!-- ══ NAV ════════════════════════════════════════════ -->
+<nav>
+  <button class="tab-btn active" data-tab="home" data-icon="⬡">OVERVIEW</button>
+  <button class="tab-btn" data-tab="ops" data-icon="✈">OPS & FLYING</button>
+  <button class="tab-btn" data-tab="edu" data-icon="⬡">ACADEMICS</button>
+  <button class="tab-btn" data-tab="intel" data-icon="◉">INTEL & TRNG</button>
+  <button class="tab-btn" data-tab="tech" data-icon="⟁">TECH & AI</button>
+  <button class="tab-btn" data-tab="pub" data-icon="📡">RESEARCH</button>
+</nav>
+
+<!-- ══ CONTENT ════════════════════════════════════════ -->
+<div class="content">
+
+<!-- ─ HOME ──────────────────────────────────────────── -->
+<div class="page active" id="page-home">
+  <div class="home-grid">
+    <div>
+      <div class="sec-hdr">PERSONNEL OVERVIEW</div>
+
+      <div class="panel" style="margin-bottom:16px;">
+        <div class="corner-tl"></div><div class="corner-br"></div>
+        <div class="panel-label">▸ IDENTITY // SERVICE RECORD</div>
+        <div class="hud-line"><span class="key">NAME</span><span class="val2">Sqn Ldr Shreyas Gaikwad</span></div>
+        <div class="hud-line"><span class="key">BRANCH</span><span class="val2">Flying (Pilot) — Fighter Stream</span></div>
+        <div class="hud-line"><span class="key">COMMISSIONED</span><span class="val2">19 December 2015</span></div>
+        <div class="hud-line"><span class="key">TOTAL SERVICE</span><span class="val2">9 Years 8 Months</span></div>
+        <div class="hud-line"><span class="key">CURRENT UNIT</span><span class="val2">32 Wing, AF (wef 12 Aug 2024)</span></div>
+        <div class="hud-line"><span class="key">APPOINTMENT</span><span class="val2">O i/c Simulator — Su-30 FMS</span></div>
+        <div class="hud-line"><span class="key">AIRCRAFT</span><span class="val2">Su-30 MKI · BAE Hawk Mk-132 · Kiran Mk-I/IA · Pilatus PC-7</span></div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-label">▸ DOMAIN PROFILE</div>
+        <div class="prog-row"><div class="prog-label"><span>FIGHTER OPERATIONS</span><span>95%</span></div><div class="prog-track"><div class="prog-fill" data-w="95"></div></div></div>
+        <div class="prog-row"><div class="prog-label"><span>INTELLIGENCE & RECCE</span><span>90%</span></div><div class="prog-track"><div class="prog-fill" data-w="90"></div></div></div>
+        <div class="prog-row"><div class="prog-label"><span>AI & DATA ENGINEERING</span><span>80%</span></div><div class="prog-track"><div class="prog-fill" data-w="80"></div></div></div>
+        <div class="prog-row"><div class="prog-label"><span>TRAINING & SIMULATION</span><span>88%</span></div><div class="prog-track"><div class="prog-fill" data-w="88"></div></div></div>
+        <div class="prog-row"><div class="prog-label"><span>CBRN / ELEC WARFARE</span><span>75%</span></div><div class="prog-track"><div class="prog-fill" data-w="75"></div></div></div>
+        <div class="prog-row"><div class="prog-label"><span>STRATEGIC STUDIES</span><span>85%</span></div><div class="prog-track"><div class="prog-fill" data-w="85"></div></div></div>
+      </div>
+    </div>
+
+    <div>
+      <div class="sec-hdr" style="font-size:11px;">METRICS</div>
+      <div class="grid-2" style="margin-bottom:16px;">
+        <div class="stat-block"><span class="val">9+</span><span class="lbl">Years Service</span></div>
+        <div class="stat-block"><span class="val">Su-30</span><span class="lbl">Primary AC</span></div>
+        <div class="stat-block"><span class="val">5</span><span class="lbl">Degrees / PG</span></div>
+        <div class="stat-block"><span class="val">2</span><span class="lbl">Publications</span></div>
+      </div>
+
+      <div class="panel" style="margin-bottom:16px;">
+        <div class="panel-label">▸ RADAR — CAPABILITY MAP</div>
+        <div class="radar-wrap">
+          <canvas id="radar-canvas" width="260" height="260"></canvas>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-label">▸ CONTACT</div>
+        <div class="hud-line"><span class="key">PHONE</span><span class="val2"><a href="tel:+919881056991" style="color:var(--hud-cyan);text-decoration:none;font-family:'Share Tech Mono',monospace;font-size:11px;">+91 9881056991</a></span></div>
+        <div class="hud-line"><span class="key">EMAIL</span><span class="val2"><a href="mailto:shreyas341@gmail.com" style="color:var(--hud-cyan);text-decoration:none;font-family:'Share Tech Mono',monospace;font-size:11px;">shreyas341@gmail.com</a></span></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="sec-hdr" style="margin-top:8px;">DISTINCTIONS</div>
+  <div class="grid-auto">
+    <div class="stat-block" style="text-align:left; padding:14px 16px;">
+      <span style="color:var(--hud-amber);font-size:20px;">★</span>
+      <span class="lbl" style="text-align:left;margin-top:6px;color:var(--hud-green);">BEST IMAGE ANALYST</span>
+      <div style="font-size:11px;color:var(--text-dim);margin-top:4px;">Adv Image Intel Course · IIS, New Delhi · 2023</div>
+    </div>
+    <div class="stat-block" style="text-align:left; padding:14px 16px;">
+      <span style="color:var(--hud-amber);font-size:20px;">★</span>
+      <span class="lbl" style="text-align:left;margin-top:6px;color:var(--hud-green);">INSTRUCTOR GRADED</span>
+      <div style="font-size:11px;color:var(--text-dim);margin-top:4px;">Electronic CCD Course · CME Pune · 2022</div>
+    </div>
+    <div class="stat-block" style="text-align:left; padding:14px 16px;">
+      <span style="color:var(--hud-amber);font-size:20px;">★</span>
+      <span class="lbl" style="text-align:left;margin-top:6px;color:var(--hud-green);">INSTRUCTOR SUITABLE</span>
+      <div style="font-size:11px;color:var(--text-dim);margin-top:4px;">Adv Image Intel + Space Laws · 2023, 2025</div>
+    </div>
+    <div class="stat-block" style="text-align:left; padding:14px 16px;">
+      <span style="color:var(--hud-amber);font-size:20px;">★</span>
+      <span class="lbl" style="text-align:left;margin-top:6px;color:var(--hud-green);">TOP OF COURSE</span>
+      <div style="font-size:11px;color:var(--text-dim);margin-top:4px;">Pre-Flying Stage: First to complete syllabus</div>
+    </div>
+  </div>
+</div><!-- /home -->
+
+<!-- ─ OPS & FLYING ────────────────────────────────────── -->
+<div class="page" id="page-ops">
+  <div class="sec-hdr">OPERATIONAL FLYING RECORD</div>
+
+  <!-- AIRCRAFT SVG BANNER -->
+  <div style="text-align:center;margin-bottom:20px;opacity:0.8;">
+    <svg width="320" height="80" viewBox="0 0 320 80">
+      <defs>
+        <filter id="glow"><feGaussianBlur stdDeviation="2" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+      </defs>
+      <!-- Su-30 silhouette simplified -->
+      <g filter="url(#glow)" stroke="#00e5ff" stroke-width="1" fill="none" opacity="0.7">
+        <!-- fuselage -->
+        <path d="M160,40 L60,44 L30,42 L60,38 L160,40Z" fill="rgba(0,229,255,0.1)"/>
+        <!-- wings -->
+        <path d="M120,40 L80,15 L110,38Z" fill="rgba(0,229,255,0.15)"/>
+        <path d="M120,40 L80,65 L110,42Z" fill="rgba(0,229,255,0.15)"/>
+        <!-- tail -->
+        <path d="M160,40 L190,28 L185,40Z" fill="rgba(0,229,255,0.1)"/>
+        <path d="M160,40 L190,52 L185,40Z" fill="rgba(0,229,255,0.1)"/>
+        <!-- nose -->
+        <path d="M30,42 L10,40 L30,38Z" fill="rgba(0,229,255,0.2)"/>
+        <!-- engines -->
+        <rect x="150" y="34" width="18" height="5" fill="rgba(0,229,255,0.2)"/>
+        <rect x="150" y="41" width="18" height="5" fill="rgba(0,229,255,0.2)"/>
+      </g>
+      <text x="220" y="36" fill="#00e5ff" font-size="9" font-family="Share Tech Mono, monospace" letter-spacing="2">SU-30 MKI</text>
+      <text x="220" y="52" fill="rgba(0,229,255,0.5)" font-size="8" font-family="Share Tech Mono, monospace">FLANKER-H</text>
+    </svg>
+  </div>
+
+  <div class="grid-2" style="margin-bottom:16px;">
+    <div>
+      <div class="panel" style="height:100%;">
+        <div class="panel-label">▸ AIRCRAFT PROGRESSION</div>
+        <div class="timeline">
+          <div class="tl-item">
+            <div class="tl-year">2014–2015</div>
+            <div class="tl-title">PILATUS PC-7 · 59 HRS</div>
+            <div class="tl-desc">Pre-flying & basic military training. First in course to complete syllabus. Selected for Fighter Stream.</div>
+          </div>
+          <div class="tl-item">
+            <div class="tl-year">2015</div>
+            <div class="tl-title">KIRAN MK-I/IA · 89 HRS</div>
+            <div class="tl-desc">Stage-2 jet flying. Formal commissioning as Fighter Pilot on 19 Dec 2015.</div>
+          </div>
+          <div class="tl-item">
+            <div class="tl-year">2016</div>
+            <div class="tl-title">BAE HAWK MK-132 AJT</div>
+            <div class="tl-desc">Air combat maneuvering, tactical employment, 9G endurance (23 sec). Advanced 1v1 / 2v2 combat training.</div>
+          </div>
+          <div class="tl-item">
+            <div class="tl-year">2017–PRESENT</div>
+            <div class="tl-title">SU-30 MKI · OPERATIONAL</div>
+            <div class="tl-desc">Operational conversion and active service. Currently Officer i/c Su-30 Full Motion Simulator System.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div>
+      <div class="panel" style="margin-bottom:16px;">
+        <div class="panel-label">▸ WEAPONS DELIVERY</div>
+        <div class="prog-row"><div class="prog-label"><span>LIVE WEAPON DELIVERY (OVERALL)</span><span>95%+</span></div><div class="prog-track"><div class="prog-fill" data-w="95"></div></div></div>
+        <div style="margin-top:8px;">
+          <span class="badge cyan">ROCKETS</span>
+          <span class="badge cyan">BOMBS</span>
+          <span class="badge cyan">GUNS</span>
+          <span class="badge cyan">MISSILES</span>
+        </div>
+      </div>
+      <div class="panel" style="margin-bottom:16px;">
+        <div class="panel-label">▸ OPERATIONAL ROLES</div>
+        <ul class="hud-list">
+          <li>Operations Adjutant — coordinated 14 combat units & 50 staff in air defence</li>
+          <li>Base Air Defence Officer during live contingencies</li>
+          <li>Supported Exercise Gaganshakti — multi-command deployment planning</li>
+          <li>Officer i/c Su-30 FMS — simulator operations, pilot training, compliance & performance evaluation</li>
+        </ul>
+      </div>
+      <div class="panel">
+        <div class="panel-label">▸ KEY PROJECTS</div>
+        <ul class="hud-list">
+          <li><strong style="color:var(--hud-cyan);">High-Altitude Practice Range:</strong> Surveyed 6,000 sq km, managed inter-agency coordination</li>
+          <li><strong style="color:var(--hud-cyan);">ALG Communications Upgrade:</strong> 7 km fibre optic network — ended 35 years of communications dependency</li>
+          <li><strong style="color:var(--hud-cyan);">Drone Counter-ops:</strong> Directed 200+ reconnaissance missions; deployed jammer systems vs drone threats</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="sec-hdr">COMMAND & MANAGEMENT</div>
+  <div class="grid-3">
+    <div class="stat-block"><span class="val">350+</span><span class="lbl">Personnel Managed</span></div>
+    <div class="stat-block"><span class="val">₹20K Cr</span><span class="lbl">Assets Supervised</span></div>
+    <div class="stat-block"><span class="val">200+</span><span class="lbl">Recce Missions</span></div>
+  </div>
+</div><!-- /ops -->
+
+<!-- ─ ACADEMICS ───────────────────────────────────────── -->
+<div class="page" id="page-edu">
+  <div class="sec-hdr">ACADEMIC RECORD</div>
+
+  <!-- circuit decoration -->
+  <svg width="100%" height="40" style="margin-bottom:8px;opacity:0.3;">
+    <line x1="0" y1="20" x2="100%" y2="20" stroke="#00e5ff" stroke-width="0.5" stroke-dasharray="4,8"/>
+    <circle cx="5%" cy="20" r="3" fill="none" stroke="#00e5ff" stroke-width="1"/>
+    <circle cx="25%" cy="20" r="3" fill="none" stroke="#00e5ff" stroke-width="1"/>
+    <circle cx="50%" cy="20" r="3" fill="none" stroke="#00e5ff" stroke-width="1"/>
+    <circle cx="75%" cy="20" r="3" fill="none" stroke="#00e5ff" stroke-width="1"/>
+    <circle cx="95%" cy="20" r="3" fill="none" stroke="#00e5ff" stroke-width="1"/>
+  </svg>
+
+  <div class="edu-card">
+    <div class="edu-degree">B.SC — PHYSICS</div>
+    <div class="edu-inst">University of Pune</div>
+    <div class="edu-meta"><span>2009 – 2013</span><span>74.15%</span></div>
+  </div>
+  <div class="edu-card">
+    <div class="edu-degree">M.SC — DEFENCE AND STRATEGIC STUDIES</div>
+    <div class="edu-inst">Savitribai Phule Pune University</div>
+    <div class="edu-meta"><span>2020 – 2022</span><span>CGPA 8.75</span></div>
+  </div>
+  <div class="edu-card">
+    <div class="edu-degree">MBA — HUMAN RESOURCES</div>
+    <div class="edu-inst">Symbiosis Skills and Professional University, Pune</div>
+    <div class="edu-meta"><span>2022 – 2024</span><span>CGPA 8.70</span></div>
+  </div>
+  <div class="edu-card" style="border-color:rgba(0,255,136,0.3);">
+    <div class="edu-degree" style="color:var(--hud-green);">M.TECH — DATA ENGINEERING <span class="badge" style="vertical-align:middle;margin-left:8px;">IN PROGRESS</span></div>
+    <div class="edu-inst">Indian Institute of Technology, Jodhpur</div>
+    <div class="edu-meta"><span>2024 – 2026 (Second Year)</span><span>CGPA 7.84 (Year 1)</span></div>
+  </div>
+  <div class="edu-card" style="border-color:rgba(255,179,0,0.3);">
+    <div class="edu-degree" style="color:var(--hud-amber);">DOCTORAL RESEARCH — SPACE TECHNOLOGY MANAGEMENT <span class="badge amber" style="vertical-align:middle;margin-left:8px;">COMMENCED</span></div>
+    <div class="edu-inst">Defence Institute of Advanced Technology (DU), Pune</div>
+    <div class="edu-meta"><span>2025 – 2028 (Part-time)</span></div>
+  </div>
+
+  <div class="sec-hdr" style="margin-top:24px;">CIVILIAN PROGRAMS</div>
+  <div class="grid-auto">
+    <div class="panel" style="padding:12px 16px;">
+      <div class="panel-label">▸ AI & COMPUTING</div>
+      <ul class="hud-list">
+        <li>Winter School on Generative AI — IIT Jodhpur, 2024</li>
+        <li>IEEE CIS Winter School — Computational Intelligence & GenAI, IIT Indore, 2025</li>
+        <li>Quantum Computing — IIT Roorkee & C-DAC, 2025</li>
+        <li>Adv AI Training for Govt Officials — C-DAC ACTS, Pune, 2025 · <span style="color:var(--hud-green);">88.66%</span></li>
+        <li>Winter Internship — India Space Lab, 2024–25</li>
+      </ul>
+    </div>
+    <div class="panel" style="padding:12px 16px;">
+      <div class="panel-label">▸ STRATEGY & GOVERNANCE</div>
+      <ul class="hud-list">
+        <li>Global Diplomacy — Coursera, 2023</li>
+        <li>Strategic Negotiations — Rashtriya Raksha University, 2024</li>
+        <li>National Security Studies FDP — RRU, 2025</li>
+        <li>Multi-Domain Ops & Future Warfare — Atma Nirbhar Soch, 2025</li>
+        <li>The Art of Negotiations — CLAWS, 2025</li>
+      </ul>
+    </div>
+    <div class="panel" style="padding:12px 16px;">
+      <div class="panel-label">▸ DEFENCE SCIENCE</div>
+      <ul class="hud-list">
+        <li>Eradication of Biological & Chemical Weapons — MIT WPU, 2020</li>
+        <li>Emerging Technologies & Security — Rudram Dynamics, 2024</li>
+        <li>ICT Tools & Online Teaching FDP — Research Foundation of India, 2025</li>
+        <li>Computational Thinking for Teachers — Commonwealth of Learning, 2023</li>
+        <li>Micro-learning — Commonwealth of Learning, 2023</li>
+      </ul>
+    </div>
+  </div>
+</div><!-- /edu -->
+
+<!-- ─ INTEL & TRAINING ────────────────────────────────── -->
+<div class="page" id="page-intel">
+  <div class="sec-hdr">INTELLIGENCE · TRAINING · SECURITY</div>
+
+  <div class="grid-2" style="margin-bottom:16px;">
+    <div>
+      <div class="panel">
+        <div class="panel-label">▸ SERVICE COURSES — DISTINCTIONS</div>
+        <div class="timeline">
+          <div class="tl-item">
+            <div class="tl-year">2022 · CME PUNE</div>
+            <div class="tl-title">ELECTRONIC CCD COURSE</div>
+            <div class="tl-desc">Camouflage, Concealment & Detection · <span class="badge" style="font-size:8px;">INSTRUCTOR GRADED</span></div>
+          </div>
+          <div class="tl-item">
+            <div class="tl-year">2023 · IIS NEW DELHI</div>
+            <div class="tl-title">ADV IMAGE INTELLIGENCE COURSE</div>
+            <div class="tl-desc"><span class="badge" style="font-size:8px;">BEST IMAGE ANALYST</span> · <span class="badge" style="font-size:8px;">INSTRUCTOR SUITABLE</span></div>
+          </div>
+          <div class="tl-item">
+            <div class="tl-year">2025 · GNLU</div>
+            <div class="tl-title">SPACE LAWS FOR AF OFFICERS</div>
+            <div class="tl-desc">Gujarat National Law University · <span class="badge" style="font-size:8px;">INSTRUCTOR SUITABLE</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div>
+      <div class="panel" style="height:100%;">
+        <div class="panel-label">▸ ALL SERVICE COURSES COMPLETED</div>
+        <ul class="hud-list">
+          <li>Composite Security Training — AFS Naliya, 2016</li>
+          <li>Forward Air Controllers — CAW, 2017</li>
+          <li>Basic Image Intelligence — IIS, New Delhi, 2022</li>
+          <li>Adv Security & Intelligence — AFIS, Pune, 2022</li>
+          <li>Electronic CCD — CME, Pune, 2022</li>
+          <li>CBRN Staff Capsule — CME, Pune, 2023</li>
+          <li>SNS & Gypsy Jammer Operations — 17 Wg AF, 2023</li>
+          <li>Su-30 Recce System GES Operators — CPRU, New Delhi, 2023</li>
+          <li>Adv Image Intelligence — IIS, New Delhi, 2023</li>
+          <li>TWD / BMC Course — 17 Tettra AF, 2024</li>
+          <li>Space Laws for AF Officers — GNLU, 2025</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="sec-hdr">OPERATIONAL INTELLIGENCE ROLES</div>
+  <div class="grid-auto">
+    <div class="panel" style="padding:14px;">
+      <div class="panel-label">▸ RECCE & JAMMER OPS</div>
+      <div style="font-family:'Share Tech Mono',monospace;font-size:30px;color:var(--hud-cyan);text-align:center;padding:10px 0;text-shadow:0 0 20px var(--hud-cyan);">200+</div>
+      <div style="font-size:11px;color:var(--text-dim);text-align:center;">Missions Directed</div>
+      <div style="font-size:12px;color:var(--text-primary);margin-top:8px;text-align:center;">Deployed SNS & Gypsy Jammer systems against drone threats</div>
+    </div>
+    <div class="panel" style="padding:14px;">
+      <div class="panel-label">▸ CBRN DEFENCE</div>
+      <div style="font-family:'Share Tech Mono',monospace;font-size:30px;color:var(--hud-amber);text-align:center;padding:10px 0;text-shadow:0 0 20px var(--hud-amber);">98%</div>
+      <div style="font-size:11px;color:var(--text-dim);text-align:center;">Serviceability Achieved</div>
+      <div style="font-size:12px;color:var(--text-primary);margin-top:8px;text-align:center;">Developed unit camouflage & CBRN defence policies</div>
+    </div>
+    <div class="panel" style="padding:14px;">
+      <div class="panel-label">▸ STATION INTELLIGENCE</div>
+      <div style="font-size:12px;color:var(--text-primary);margin-top:8px;line-height:1.7;">
+        Acted as Station Intelligence Officer during live contingencies.<br>
+        Maintained 45,000+ maps and navigational publications.<br>
+        Managed Ground Reconnaissance Systems portfolio.
+      </div>
+    </div>
+    <div class="panel" style="padding:14px;">
+      <div class="panel-label">▸ SIMULATOR TRAINING</div>
+      <div style="font-size:12px;color:var(--text-primary);margin-top:8px;line-height:1.7;">
+        O i/c Su-30 Full Motion Simulator System.<br>
+        Directed pilot training, compliance & performance evaluation.<br>
+        Reduced training costs through simulator-based frameworks.
+      </div>
+    </div>
+  </div>
+</div><!-- /intel -->
+
+<!-- ─ TECH & AI ────────────────────────────────────────── -->
+<div class="page" id="page-tech">
+  <div class="sec-hdr">TECHNOLOGY · AI · DATA ENGINEERING</div>
+
+  <!-- animated circuit background panel -->
+  <div style="position:relative;overflow:hidden;margin-bottom:16px;">
+    <canvas id="circuit-canvas" width="100" height="60" style="position:absolute;top:0;left:0;width:100%;height:100%;opacity:0.15;"></canvas>
+    <div class="panel" style="position:relative;z-index:1;">
+      <div class="panel-label">▸ TECHNICAL FOCUS AREAS</div>
+      <div class="hex-grid">
+        <div class="hex-item">DATA ENGINEERING</div>
+        <div class="hex-item">GENERATIVE AI</div>
+        <div class="hex-item">MACHINE LEARNING</div>
+        <div class="hex-item">QUANTUM COMPUTING</div>
+        <div class="hex-item">SPACE TECHNOLOGY</div>
+        <div class="hex-item">AI GOVERNANCE</div>
+        <div class="hex-item">CYBER SECURITY</div>
+        <div class="hex-item">ELECTRONIC WARFARE</div>
+        <div class="hex-item">COMPUTATIONAL INTEL</div>
+        <div class="hex-item">CBRN SYSTEMS</div>
+        <div class="hex-item">DRONE COUNTERMEASURES</div>
+        <div class="hex-item">SPACE LAW</div>
+        <div class="hex-item">ICT TOOLS</div>
+        <div class="hex-item">MULTI-DOMAIN OPS</div>
+        <div class="hex-item">NEURAL NETWORKS</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="grid-2">
+    <div>
+      <div class="panel" style="margin-bottom:16px;">
+        <div class="panel-label">▸ ACADEMIC TECH PURSUITS</div>
+        <div class="timeline">
+          <div class="tl-item">
+            <div class="tl-year">2024 · IIT JODHPUR</div>
+            <div class="tl-title">M.TECH DATA ENGINEERING</div>
+            <div class="tl-desc">Currently pursuing. CGPA 7.84 (Year 1). Focus on data systems, engineering and analysis at scale.</div>
+          </div>
+          <div class="tl-item">
+            <div class="tl-year">2025 · DIAT(DU) PUNE</div>
+            <div class="tl-title">DOCTORAL RESEARCH — SPACE TECH MGMT</div>
+            <div class="tl-desc">Part-time research. Working on AI-enabled Space Governance Framework (publication under review).</div>
+          </div>
+        </div>
+      </div>
+      <div class="panel">
+        <div class="panel-label">▸ AI / COMPUTING PROGRAMS</div>
+        <ul class="hud-list">
+          <li>Winter School on Generative AI — IIT Jodhpur, 2024</li>
+          <li>IEEE CIS Winter School on Computational Intelligence & GenAI — IIT Indore, 2025</li>
+          <li>Quantum Computing — IIT Roorkee & C-DAC, 2025</li>
+          <li>Advanced AI Training for Govt Officials — C-DAC ACTS Pune, 2025 · <strong style="color:var(--hud-green);">88.66%</strong></li>
+          <li>Winter Internship — India Space Lab, 2024–25</li>
+        </ul>
+      </div>
+    </div>
+    <div>
+      <div class="panel" style="margin-bottom:16px;">
+        <div class="panel-label">▸ TECH-IN-OPERATIONS</div>
+        <ul class="hud-list">
+          <li>Implemented 7 km fibre optic network at Advanced Landing Ground — ended 35 years of communications dependency</li>
+          <li>Served as Squadron IT Officer — maintained &gt;90% system availability across platforms</li>
+          <li>Deployed SNS & Gypsy Jammer systems for drone threat mitigation</li>
+          <li>Operated Su-30 Recce System GES for intelligence gathering missions</li>
+          <li>Developed simulator-based training frameworks reducing cost & increasing safety</li>
+        </ul>
+      </div>
+      <div class="panel">
+        <div class="panel-label">▸ STRATEGIC TECHNOLOGY</div>
+        <ul class="hud-list">
+          <li>Emerging Technologies & Security — Rudram Dynamics, 2024</li>
+          <li>Multi-Domain Ops & Future Warfare — Atma Nirbhar Soch, 2025</li>
+          <li>Space Laws for Armed Forces — GNLU, 2025 · Instructor Suitable</li>
+          <li>Cyber Security & Asymmetric Warfare — published in Blue Yonder Journal, 2025</li>
+          <li>AI-enabled Space Governance — research under review</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div><!-- /tech -->
+
+<!-- ─ PUBLICATIONS ─────────────────────────────────────── -->
+<div class="page" id="page-pub">
+  <div class="sec-hdr">RESEARCH & PUBLICATIONS</div>
+
+  <!-- signal wave decoration -->
+  <svg width="100%" height="50" style="margin-bottom:16px;opacity:0.4;">
+    <path d="M0,25 Q40,5 80,25 Q120,45 160,25 Q200,5 240,25 Q280,45 320,25 Q360,5 400,25 Q440,45 480,25 Q520,5 560,25 Q600,45 640,25 Q680,5 720,25 Q760,45 800,25" fill="none" stroke="#00e5ff" stroke-width="1.5"/>
+    <path d="M0,30 Q30,18 60,30 Q90,42 120,30 Q150,18 180,30 Q210,42 240,30 Q270,18 300,30" fill="none" stroke="#00ff88" stroke-width="0.8" opacity="0.5"/>
+  </svg>
+
+  <div class="sec-hdr" style="font-size:11px;">PUBLISHED</div>
+
+  <div class="pub-card">
+    <div class="pub-title">Moths Diversity of Ziro in Lower Subhansiri District, Arunachal Pradesh India</div>
+    <div class="pub-meta">INTERNATIONAL JOURNAL OF SCIENTIFIC RESEARCH PUBLICATIONS · 2021</div>
+    <div style="margin-top:8px;"><span class="badge">PEER REVIEWED</span><span class="badge cyan">BIODIVERSITY</span></div>
+  </div>
+
+  <div class="pub-card">
+    <div class="pub-title">Enhancing Cyber Security and Asymmetric Warfare Capabilities: Strategic Imperative for Air Forces</div>
+    <div class="pub-meta">BLUE YONDER — JOURNAL OF AEROSPACE STUDIES · 2025</div>
+    <div style="margin-top:8px;"><span class="badge">PEER REVIEWED</span><span class="badge cyan">CYBER SECURITY</span><span class="badge amber">AEROSPACE</span></div>
+  </div>
+
+  <div class="sec-hdr" style="margin-top:24px;font-size:11px;">UNDER REVIEW</div>
+  <div class="pub-card" style="border-color:rgba(255,179,0,0.4);">
+    <div class="pub-title" style="color:var(--hud-amber);">Space Governance Framework Using Artificial Intelligence</div>
+    <div class="pub-meta" style="color:rgba(255,179,0,0.6);">STATUS: UNDER REVIEW · <span class="blink">■ PENDING PUBLICATION</span></div>
+    <div style="margin-top:8px;"><span class="badge amber">SPACE TECH</span><span class="badge amber">AI GOVERNANCE</span><span class="badge amber">DOCTORAL</span></div>
+  </div>
+
+  <div class="sec-hdr" style="margin-top:24px;">RESEARCH INTERESTS</div>
+  <div class="grid-auto">
+    <div class="panel" style="padding:14px;">
+      <div class="panel-label">▸ SPACE TECHNOLOGY</div>
+      <div style="font-size:12px;color:var(--text-dim);line-height:1.7;">AI-enabled space governance frameworks. Space law for armed forces. Technology management in space domain. Pursuing doctoral research at DIAT (DU).</div>
+    </div>
+    <div class="panel" style="padding:14px;">
+      <div class="panel-label">▸ CYBER & WARFARE</div>
+      <div style="font-size:12px;color:var(--text-dim);line-height:1.7;">Asymmetric warfare and cyber capabilities for air forces. Multi-domain operations, electronic warfare and emerging threat landscapes.</div>
+    </div>
+    <div class="panel" style="padding:14px;">
+      <div class="panel-label">▸ AI IN DEFENCE</div>
+      <div style="font-size:12px;color:var(--text-dim);line-height:1.7;">Application of generative AI, data engineering and computational intelligence to defence and strategic planning. Simulation and training systems.</div>
+    </div>
+  </div>
+</div><!-- /pub -->
+
+</div><!-- /content -->
+
+<footer>
+  <span>SQN LDR SHREYAS GAIKWAD · IAF · F(P)</span>
+  <span id="footer-date">--/--/----</span>
+  <span>GEEK1060.GITHUB.IO // V1.0</span>
+</footer>
+
+</div><!-- /wrapper -->
 
 <script>
-// ================= THREE WAR ROOM EARTH ==================
-let scene = new THREE.Scene();
-let camera = new THREE.PerspectiveCamera(45, innerWidth/innerHeight, 0.1, 1000);
-camera.position.z = 4;
-
-let renderer = new THREE.WebGLRenderer({alpha:true, antialias:true});
-renderer.setSize(innerWidth, innerHeight);
-document.body.appendChild(renderer.domElement);
-
-// Earth
-let earth = new THREE.Mesh(
-  new THREE.SphereGeometry(1,64,64),
-  new THREE.MeshPhongMaterial({
-    map:new THREE.TextureLoader().load("https://threejs.org/examples/textures/planets/earth_atmos_2048.jpg"),
-    emissive:new THREE.Color(0x112244)
-  })
-);
-scene.add(earth);
-
-// Lights
-scene.add(new THREE.DirectionalLight(0xffffff,1).position.set(5,2,5));
-scene.add(new THREE.AmbientLight(0x223355));
-
-// Tactical Orbit Rings
-for(let i=0;i<5;i++){
-  let ring = new THREE.Mesh(
-    new THREE.RingGeometry(1.2+i*0.2,1.2+i*0.2,128),
-    new THREE.MeshBasicMaterial({color:0x00aaff, side:THREE.DoubleSide, transparent:true, opacity:0.2})
-  );
-  ring.rotation.x=Math.PI/2;
-  scene.add(ring);
+// ─── CLOCK ───────────────────────────────────────────────
+function updateClock(){
+  const now = new Date();
+  const h=String(now.getHours()).padStart(2,'0');
+  const m=String(now.getMinutes()).padStart(2,'0');
+  const s=String(now.getSeconds()).padStart(2,'0');
+  document.getElementById('clock').textContent = `${h}:${m}:${s} IST`;
+  const d=now.toLocaleDateString('en-IN',{day:'2-digit',month:'2-digit',year:'numeric'});
+  document.getElementById('footer-date').textContent = d;
 }
+setInterval(updateClock,1000); updateClock();
 
-// Render Loop
-function animate(){
-  requestAnimationFrame(animate);
-  earth.rotation.y += 0.0003;
-  renderer.render(scene,camera);
-}
-animate();
-
-onresize=()=>{
-  camera.aspect=innerWidth/innerHeight;
-  camera.updateProjectionMatrix();
-  renderer.setSize(innerWidth, innerHeight);
-};
-
-// ================= HOLOGRAPHIC HAND CONTROL =================
-const video = document.getElementById("inputVideo");
-
-const hands = new Hands({
-  locateFile: f => `https://cdn.jsdelivr.net/npm/@mediapipe/hands/${f}`
+// ─── TABS ─────────────────────────────────────────────────
+document.querySelectorAll('.tab-btn').forEach(btn=>{
+  btn.addEventListener('click',()=>{
+    document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+    document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById('page-'+btn.dataset.tab).classList.add('active');
+    animateProgs();
+  });
 });
-hands.setOptions({maxNumHands:1, modelComplexity:1, minDetectionConfidence:0.7, minTrackingConfidence:0.7});
 
-let lastX=null, lastY=null;
+// ─── PROGRESS BARS ────────────────────────────────────────
+function animateProgs(){
+  document.querySelectorAll('.prog-fill').forEach(el=>{
+    el.style.width='0';
+    setTimeout(()=>{ el.style.width = el.dataset.w+'%'; },100);
+  });
+}
+animateProgs();
 
-hands.onResults(res=>{
-  if(!res.multiHandLandmarks) return;
-  let lm = res.multiHandLandmarks[0];
-  let index = lm[8];
-  let thumb = lm[4];
+// ─── PARTICLE BG CANVAS ───────────────────────────────────
+(function(){
+  const c=document.getElementById('bg-canvas');
+  const ctx=c.getContext('2d');
+  let W,H,particles=[];
 
-  let pinch = Math.hypot(index.x-thumb.x, index.y-thumb.y);
+  function resize(){ W=c.width=window.innerWidth; H=c.height=window.innerHeight; }
+  resize(); window.addEventListener('resize',resize);
 
-  // PINCH = ROTATE EARTH
-  if(pinch<0.04){
-    if(lastX){
-      earth.rotation.y += (index.x-lastX)*5;
-      earth.rotation.x += (index.y-lastY)*5;
+  for(let i=0;i<60;i++) particles.push({
+    x:Math.random()*1920, y:Math.random()*1080,
+    vx:(Math.random()-0.5)*0.3, vy:(Math.random()-0.5)*0.3,
+    r:Math.random()*1.5+0.5, a:Math.random()
+  });
+
+  function draw(){
+    ctx.clearRect(0,0,W,H);
+    particles.forEach(p=>{
+      p.x+=p.vx; p.y+=p.vy;
+      if(p.x<0)p.x=W; if(p.x>W)p.x=0;
+      if(p.y<0)p.y=H; if(p.y>H)p.y=0;
+      ctx.beginPath();
+      ctx.arc(p.x,p.y,p.r,0,Math.PI*2);
+      ctx.fillStyle=`rgba(0,229,255,${p.a*0.5})`;
+      ctx.fill();
+    });
+    // draw some lines between close particles
+    for(let i=0;i<particles.length;i++){
+      for(let j=i+1;j<particles.length;j++){
+        const dx=particles[i].x-particles[j].x;
+        const dy=particles[i].y-particles[j].y;
+        const d=Math.sqrt(dx*dx+dy*dy);
+        if(d<120){
+          ctx.beginPath();
+          ctx.strokeStyle=`rgba(0,229,255,${0.15*(1-d/120)})`;
+          ctx.lineWidth=0.5;
+          ctx.moveTo(particles[i].x,particles[i].y);
+          ctx.lineTo(particles[j].x,particles[j].y);
+          ctx.stroke();
+        }
+      }
     }
-    lastX=index.x; lastY=index.y;
-  } else {
-    lastX=null;
+    requestAnimationFrame(draw);
   }
-});
+  draw();
+})();
 
-// Camera feed
-const cam = new Camera(video,{
-  onFrame: async()=>await hands.send({image:video}),
-  width:640,height:480
-});
-cam.start();
+// ─── RADAR CHART ──────────────────────────────────────────
+(function(){
+  const c=document.getElementById('radar-canvas');
+  if(!c) return;
+  const ctx=c.getContext('2d');
+  const W=260,H=260,cx=W/2,cy=H/2,R=100;
+  const labels=['FLYING OPS','INTEL','AI/DATA','TRAINING','CBRN/EW','STRATEGY'];
+  const vals=[0.95,0.90,0.80,0.88,0.75,0.85];
+  const N=labels.length;
+  let anim=0;
+
+  function hexX(i,r){ return cx+r*Math.cos(i*2*Math.PI/N - Math.PI/2); }
+  function hexY(i,r){ return cy+r*Math.sin(i*2*Math.PI/N - Math.PI/2); }
+
+  function draw(t){
+    ctx.clearRect(0,0,W,H);
+    // rings
+    for(let ring=1;ring<=5;ring++){
+      const r=R*ring/5;
+      ctx.beginPath();
+      for(let i=0;i<N;i++){
+        i===0 ? ctx.moveTo(hexX(i,r),hexY(i,r)) : ctx.lineTo(hexX(i,r),hexY(i,r));
+      }
+      ctx.closePath();
+      ctx.strokeStyle='rgba(0,229,255,0.12)';
+      ctx.lineWidth=1; ctx.stroke();
+    }
+    // spokes
+    for(let i=0;i<N;i++){
+      ctx.beginPath(); ctx.moveTo(cx,cy); ctx.lineTo(hexX(i,R),hexY(i,R));
+      ctx.strokeStyle='rgba(0,229,255,0.15)'; ctx.lineWidth=1; ctx.stroke();
+    }
+    // data
+    const f=Math.min(t,1);
+    ctx.beginPath();
+    for(let i=0;i<N;i++){
+      const r=R*vals[i]*f;
+      i===0 ? ctx.moveTo(hexX(i,r),hexY(i,r)) : ctx.lineTo(hexX(i,r),hexY(i,r));
+    }
+    ctx.closePath();
+    ctx.fillStyle='rgba(0,229,255,0.15)';
+    ctx.strokeStyle='rgba(0,229,255,0.8)';
+    ctx.lineWidth=1.5;
+    ctx.fill(); ctx.stroke();
+    // dots
+    for(let i=0;i<N;i++){
+      const r=R*vals[i]*f;
+      ctx.beginPath(); ctx.arc(hexX(i,r),hexY(i,r),3,0,Math.PI*2);
+      ctx.fillStyle='#00e5ff'; ctx.fill();
+    }
+    // labels
+    ctx.fillStyle='rgba(0,229,255,0.7)';
+    ctx.font='7px Share Tech Mono, monospace';
+    ctx.textAlign='center';
+    for(let i=0;i<N;i++){
+      const lx=hexX(i,R+18), ly=hexY(i,R+18);
+      ctx.fillText(labels[i],lx,ly+3);
+    }
+  }
+
+  let start=null;
+  function aframe(ts){
+    if(!start)start=ts;
+    const t=(ts-start)/1000;
+    draw(t);
+    if(t<1.5) requestAnimationFrame(aframe);
+    else draw(1.5);
+  }
+  requestAnimationFrame(aframe);
+})();
 </script>
+
 </body>
 </html>
